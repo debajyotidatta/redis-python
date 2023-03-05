@@ -15,6 +15,7 @@ def main():
         while True:
             data = conn.recv(6379)
             if data!=None:
+                
                 conn.sendall(b"+PONG\r\n")
 
 
