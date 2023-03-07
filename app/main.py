@@ -3,23 +3,27 @@ import socket
 import asyncio
 
 
-async def multi_client(server):
+async def multi_client():
+    server = socket.create_server(("localhost", 6379), reuse_port=True)
+    tasks = []
     while True:
-        client, addr = await server.accept()
+        client, _ = await server.accept()
+        tasks.append(client)
         while client:
             data = await client.recv(6379)
             if data:
                 await client.sendall(b"+PONG\r\n")
             else:
                 break
+        await asyncio.gather(*tasks)
         
 
 async def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
 
-    server = socket.create_server(("localhost", 6379), reuse_port=True)
-    await asyncio.gather(multi_client(server), multi_client(server), multi_client(server))
+    multi_client()
+    
 
     # conn, addr = server_socket.accept() # wait for client
     # with conn:
