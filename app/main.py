@@ -1,22 +1,34 @@
 # Uncomment this to pass the first stage
 import socket
+import asyncio
 
 
-def main():
+async def multi_client(server):
+    while True:
+        client, addr = await server.accept()
+        while client:
+            data = await client.recv(6379)
+            if data:
+                await client.sendall(b"+PONG\r\n")
+            else:
+                break
+        
+
+async def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
 
-    # Uncomment this to pass the first stage
-    #
-    server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
-    conn, addr = server_socket.accept() # wait for client
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(6379)
-            if data!=None:
-                
-                conn.sendall(b"+PONG\r\n")
+    server = socket.create_server(("localhost", 6379), reuse_port=True)
+    await asyncio.gather(multi_client(server), multi_client(server), multi_client(server))
+
+    # conn, addr = server_socket.accept() # wait for client
+    # with conn:
+    #     print(f"Connected by {addr}")
+    #     while True:
+    #         data = conn.recv(6379)
+    #         if data!=None:
+
+    #             conn.sendall(b"+PONG\r\n")
 
 
 
