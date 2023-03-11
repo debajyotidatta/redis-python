@@ -1,38 +1,42 @@
 # Uncomment this to pass the first stage
 import socket
-import asyncio
+import threading
 
 
-async def multi_client():
-    server = socket.create_server(("localhost", 6379), reuse_port=True)
-    tasks = []
-    while True:
-        client, _ = await server.accept()
-        tasks.append(client)
-        while client:
-            data = await client.recv(6379)
-            if data:
-                await client.sendall(b"+PONG\r\n")
-            else:
-                break
-        await asyncio.gather(*tasks)
+# def multi_client():
+#     server = socket.create_server(("localhost", 6379), reuse_port=True)
+#     while True:
+#         client, _ = server.accept()
+#         while client:
+#             data = client.recv(6379)
+#             if data:
+#                 client.sendall(b"+PONG\r\n")
+#             else:
+#                 break
         
 
-async def main():
+def handle_client(conn, addr):
+    connected = True
+    while connected:
+        data = conn.recv(6379)
+        if data.decode() == "QUIT":
+            connected = False
+        elif data:
+            # print("Received: ", data.decode())
+            conn.sendall(b"+PONG\r\n")
+    conn.close()
+
+def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
+    server = socket.create_server(("localhost", 6379), reuse_port=True)
+    while True:
+        client, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(client, addr))
+        thread.start()
+        
 
-    multi_client()
     
-
-    # conn, addr = server_socket.accept() # wait for client
-    # with conn:
-    #     print(f"Connected by {addr}")
-    #     while True:
-    #         data = conn.recv(6379)
-    #         if data!=None:
-
-    #             conn.sendall(b"+PONG\r\n")
 
 
 
