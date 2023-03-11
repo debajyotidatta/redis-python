@@ -3,24 +3,15 @@ import socket
 import threading
 
 
-# def multi_client():
-#     server = socket.create_server(("localhost", 6379), reuse_port=True)
-#     while True:
-#         client, _ = server.accept()
-#         while client:
-#             data = client.recv(6379)
-#             if data:
-#                 client.sendall(b"+PONG\r\n")
-#             else:
-#                 break
-        
-
 def handle_client(conn, addr):
     connected = True
     while connected:
         data = conn.recv(6379)
         if data.decode() == "QUIT":
             connected = False
+        elif "ECHO" in data.decode():
+            # print(data.decode().partition("ECHO")[2])
+            conn.sendall(data.decode().partition("ECHO")[2].lstrip().encode())
         elif data:
             # print("Received: ", data.decode())
             conn.sendall(b"+PONG\r\n")
