@@ -2,8 +2,15 @@
 import socket
 import threading
 
-# def process_resp_string(resp_string):
-
+def process_resp_string(resp_string):
+    resp_string = resp_string.split("\n")
+    new_str = []
+    for j in resp_string:
+        if len(j)>0:
+            if j[0]!= '*' and j[0]!= '$':
+                new_str.append(j.rstrip('\r'))
+    return " ".join(new_str[1:])
+        
 
 def handle_client(conn, addr):
     connected = True
@@ -12,11 +19,12 @@ def handle_client(conn, addr):
         if data.decode() == "QUIT":
             connected = False
         elif "ECHO" in data.decode():
-            print(data.decode())
-            conn.sendall(data.decode().partition("ECHO")[2].lstrip().encode())
-        # elif data:
-        #     # print("Received: ", data.decode())
-        #     conn.sendall(b"+PONG\r\n")
+
+            output_string = data.decode()
+            output_string = process_resp_string(output_string)
+            conn.sendall(b"+%s\r\n" % output_string.encode())
+        elif data:
+            conn.sendall(b"+PONG\r\n")
     conn.close()
 
 def main():
