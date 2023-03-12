@@ -14,16 +14,24 @@ def process_resp_string(resp_string):
 
 def handle_client(conn, addr):
     connected = True
+    result_dict = {}
     while connected:
         data = conn.recv(6379)
         if data.decode() == "QUIT":
             connected = False
-        elif ("ECHO" in data.decode()) or ("echo" in data.decode()):
-            output_string = data.decode()
-            output_string = process_resp_string(output_string)
+        elif ("ECHO" in data) or ("echo" in data):
+            output_string = process_resp_string(data.decode())
             conn.sendall(b"+%s\r\n" % output_string.encode())
+        # elif ("ECHO" in data.decode()) or ("echo" in data.decode()):
+        #     output_string = data.decode()
+        #     output_string = process_resp_string(output_string)
+        #     conn.sendall(b"+%s\r\n" % output_string.encode())
+        # elif ("ECHO" in data.decode()) or ("echo" in data.decode()):
+        #     output_string = data.decode()
+        #     output_string = process_resp_string(output_string)
+        #     conn.sendall(b"+%s\r\n" % output_string.encode())
         elif data:
-            print(data)
+            # print(data)
             conn.sendall(b"+PONG\r\n")
     conn.close()
 
