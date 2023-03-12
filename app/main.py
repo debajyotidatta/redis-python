@@ -14,9 +14,9 @@ def handle_client(conn, addr):
         elif "ECHO" in data.decode():
             print(data.decode())
             conn.sendall(data.decode().partition("ECHO")[2].lstrip().encode())
-        elif data:
-            # print("Received: ", data.decode())
-            conn.sendall(b"+PONG\r\n")
+        # elif data:
+        #     # print("Received: ", data.decode())
+        #     conn.sendall(b"+PONG\r\n")
     conn.close()
 
 def main():
