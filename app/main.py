@@ -2,6 +2,8 @@
 import socket
 import threading
 
+# def process_resp_string(resp_string):
+
 
 def handle_client(conn, addr):
     connected = True
@@ -10,7 +12,7 @@ def handle_client(conn, addr):
         if data.decode() == "QUIT":
             connected = False
         elif "ECHO" in data.decode():
-            # print(data.decode().partition("ECHO")[2])
+            print(data.decode())
             conn.sendall(data.decode().partition("ECHO")[2].lstrip().encode())
         elif data:
             # print("Received: ", data.decode())
