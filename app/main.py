@@ -18,7 +18,7 @@ def handle_client(conn, addr):
         data = conn.recv(6379)
         if data.decode() == "QUIT":
             connected = False
-        elif "ECHO" in data.decode():
+        elif "ECHO" or "echo" in data.decode():
             output_string = data.decode()
             output_string = process_resp_string(output_string)
             conn.sendall(b"+%s\r\n" % output_string.encode())
