@@ -68,6 +68,7 @@ def process_set(resp_string, result_dict, time_dict):
             if j[0]!= '*' and j[0]!= '$':
                 new_str.append(j.rstrip('\r'))
     result_dict[new_str[1]] = new_str[2]
+    print(new_str)
     if len(new_str) == 5:
         time_dict[new_str[1]] = time.time() + int(new_str[4])
     return "OK"
