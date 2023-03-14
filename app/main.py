@@ -48,10 +48,11 @@ def process_get(resp_string, result_dict, time_dict):
                 new_str.append(j.rstrip('\r'))
     if new_str[1] in result_dict:
         if new_str[1] in time_dict:
-            if time_dict[new_str[1]] > time.time():
+            if (int(round(time.time()*1000)) - time_dict[new_str[1]]) < 0:
+                print("time diff is", time_dict[new_str[1]] - int(round(time.time()*1000)))
                 return result_dict[new_str[1]]
             else:
-                return "nil"
+                return "empty"
         else:
             return result_dict[new_str[1]]
     else:
@@ -67,10 +68,13 @@ def process_set(resp_string, result_dict, time_dict):
         if len(j)>0:
             if j[0]!= '*' and j[0]!= '$':
                 new_str.append(j.rstrip('\r'))
+    # if len(new_str) > 5:
+    #     return "$-1\r\n"
     result_dict[new_str[1]] = new_str[2]
-    print(new_str)
+    # print(new_str)
     if len(new_str) == 5:
-        time_dict[new_str[1]] = time.time() + int(new_str[4])
+        time_dict[new_str[1]] = int(round(time.time()*1000)) + int(new_str[4])
+        # print(time_dict)
     return "OK"
         
 
@@ -90,6 +94,8 @@ def handle_client(conn, addr):
             output_string = data.decode()
             output_string = process_get(output_string, result_dict, time_dict)
             # print(result_dict)
+            if output_string == "empty":
+                conn.sendall(b"$-1\r\n")
             conn.sendall(b"+%s\r\n" % output_string.encode())
         elif ("SET" in data.decode()) or ("set" in data.decode()):
             output_string = data.decode()
